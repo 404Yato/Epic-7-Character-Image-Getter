@@ -6,34 +6,34 @@ import os
 
 async def get_name_heros():
 
-    # URL a la que deseas hacer la solicitud
+        # URL you want to make the request to
     url = 'https://epic7x.com/characters/'
 
-    # Realizar la solicitud utilizando urllib
+    # Making the request using urllib
     request = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     response = urlopen(request)
 
-    # Verificar si la solicitud fue exitosa (código de respuesta 200)
+    # Checking if the request was successful (response code 200)
     if response.getcode() == 200:
-        # Leer el contenido de la respuesta
+        # Reading the content of the response
         html = response.read().decode('utf-8')
         # print(html_read)
     else:
-        raise Exception('Error en la solicitud:', response.getcode())
+        raise Exception('Error in the request:', response.getcode())
 
-    # Buscar el script que contiene la información necesaria
+    # Finding the script that contains the necessary information
     start_index = html.find('var CHARACTERS = ')
     end_index = html.find('jQuery("body").on("click", ".glossary-button"')
     script_content = html[start_index + 16:end_index]
 
-    # Eliminar el punto y coma al final si existe
+    # Removing semicolon at the end if exists
     script_content = re.sub(r';\s*$', '', script_content)
 
-    # Convertir el contenido del script a un objeto Python
+    # Converting the script content to a Python object
     characters = json.loads(script_content)
 
     names = [ch["name"] for ch in characters]
-    
+
     return names
 
 async def get_urls():
@@ -48,28 +48,27 @@ async def get_urls():
         urls.append(url)
     #print(urls)
     return (urls)
-        
+
 
 async def get_link_img_heros():
     
     urls = await get_urls();
     not_img = []
-    img_links = []
     char_links = []
     for url in urls:
-        # Realizar la solicitud utilizando urllib
+        # Making the request using urllib
         request = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         response = urlopen(request)
 
-        # Verificar si la solicitud fue exitosa (código de respuesta 200)
+        # Checking if the request was successful (response code 200)
         if response.getcode() == 200:
-            # Leer el contenido de la respuesta
+            # Reading the content of the response
             html = response.read().decode('utf-8')
 
         else:
-            raise Exception('Error en la solicitud:', response.getcode())
+            raise Exception('Error in the request:', response.getcode())
 
-        # Buscar el script que contiene la información necesaria
+        # Finding the script that contains the necessary information
         start_index = html.find('var SELECTED_SKIN =')
         end_index = html.find('console.log(SKINS);')
         script_content = html[start_index + 21:end_index]
@@ -79,7 +78,7 @@ async def get_link_img_heros():
             not_img.append(not_img_char)
             continue
         
-        # Eliminar el punto y coma al final si existe
+        # Removing semicolon at the end if exists
         script_content = re.sub(r"';\s*$", '', script_content)
 
         formatted_data = (url.split('/')[-2].capitalize(), script_content)
@@ -98,6 +97,7 @@ async def create_dir(name):
         os.makedirs(directory)
         return directory
     return directory
+
 async def download_image():
 
     links, without_image = await get_link_img_heros();
